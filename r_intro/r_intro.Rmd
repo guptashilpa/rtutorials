@@ -1,0 +1,148 @@
+---
+title: "Introduction to R"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+## R
+
+R is a system and a software language for statistical analysis and graphics. It was originally created by Ross Ihaka and Robert Gentleman and since distributed under General Public License (GNU) where its development and distribution is carried out by R Development Core Team.
+
+R can be downloaded from Comprehensive R Archive Network (CRAN) [https://www.r-project.org/](https://www.r-project.org/)
+
+Once installed on your computer you can use it as a command line prompt. 
+
+### Exercise 
+
+*Here's a simple exercise with an empty code chunk provided for entering the answer.*
+
+Write the R code required to add two plus two:
+
+```{r two-plus-two, exercise=TRUE}
+
+```
+
+
+For data analysis RStudio Integrated Development Environment (IDE) is more popular among data analysts. RStudio can be downloaded from [https://posit.co/download/rstudio-desktop/](https://posit.co/download/rstudio-desktop/)
+
+Before we jump into the IDE, lets us get familiar with the basics of R programming language
+
+Any programming language is characterized by how it represents data and operations on that data. R is no different. There are types of data, data objects used for representing data. There are operators, inbuilt-functions and user defined functions that are used for transforming the data.
+
+## Data
+
+### Data Type
+
+The most basic data types are integers, floats, character, 
+
+### Data Objects
+
+The data can be scalar, for example 
+
+The data be a vector, for example
+
+The other data objects that you will be commonly using in this course are
+
+
+`<-` is used for assigning values to variables
+
+Write the R code to create a vector of integers from 1 to 5:
+
+```{r vector-def, exercise=TRUE}
+
+```
+
+## Functions and Operations
+
+### Operations 
+
+Scalar operations: 
+
+
+
+Write the R code to create two vectors of integers and perform an operation :
+
+For example: adding (1,2,3) and (2,3,4)
+
+```{r vector-op, exercise=TRUE}
+
+```
+
+
+### In-built Function
+
+Packages in R and commonly used functions:
+
+Write the R code to concatenate two strings: (Hint: you can use `paste` to achieve that)
+
+```{r str-cat, exercise=TRUE}
+welcome_string <- c("My name is ")
+# Please enter your name
+your_name <- c("...")
+print(....)
+```
+
+```{r str-cat-hint}
+print(paste(welcome_string, your_name))
+```
+
+### User Defined Functions
+
+
+### Exercise with Code
+
+*Here's an exercise with some prepopulated code as well as `exercise.lines = 5` to provide a bit more initial room to work.*
+
+Now write a function that adds any two numbers and then call it:
+
+```{r add-function, exercise=TRUE, exercise.lines = 5}
+add <- function() {
+  
+}
+```
+
+## Topic 2
+
+### Exercise with Hint
+
+*Here's an exercise where the chunk is pre-evaluated via the `exercise.eval` option (so the user can see the default output we'd like them to customize). We also add a "hint" to the correct solution via the chunk immediate below labeled `print-limit-hint`.*
+
+Modify the following code to limit the number of rows printed to 5:
+
+```{r print-limit, exercise=TRUE, exercise.eval=TRUE}
+mtcars
+```
+
+```{r print-limit-hint}
+head(mtcars)
+```
+
+### Quiz
+
+*You can include any number of single or multiple choice questions as a quiz. Use the `question` function to define a question and the `quiz` function for grouping multiple questions together.*
+
+Some questions to verify that you understand the purposes of various base and recommended R packages:
+
+```{r quiz}
+quiz(
+  question("Which package contains functions for installing other R packages?",
+    answer("base"),
+    answer("tools"),
+    answer("utils", correct = TRUE),
+    answer("codetools")
+  ),
+  question("Which of the R packages listed below are used to create plots?",
+    answer("lattice", correct = TRUE),
+    answer("tools"),
+    answer("stats"),
+    answer("grid", correct = TRUE)
+  )
+)
+```
+

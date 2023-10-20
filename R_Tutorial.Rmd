@@ -1,0 +1,191 @@
+---
+title: "Review R Introduction"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+# devtools::install_github("rstudio-education/gradethis")
+library(gradeR)
+library(testthat) 
+# devtools::install_github("rundel/learnrhash")
+library(learnrhash)
+
+library(Hmisc) #useful for describing the dataset
+
+tutorial_options(exercise.timelimit = 60, exercise.checker = gradethis::grade_learnr)
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Introduction
+
+### Learning Goal
+This is an *ungraded* tutorial. The objective is to review some key concepts covered in the R-intro website provided in the reference readings, sections 1 - 4. It is not meant to be exhaustive in coverage. 
+
+### Reference Readings
+
+https://cran.r-project.org/doc/manuals/r-release/R-intro.html
+
+### First, lets know how to get help
+
+*Here's a simple exercise with an empty code chunk provided for entering the answer.*
+
+Write the R code required to get correct syntax for function read.csv from the documentation
+
+```{r exercise_help, exercise= TRUE, exercise.eval=TRUE}
+
+```
+
+
+```{r exercise_help-check}
+grade_result(
+  pass_if(~ identical(.result, help(read.csv)), "Good job!")
+)
+```
+
+Two handy functions for getting or setting the filepath to the working directory are getwd() and setwd(). Do check the documentation by running help(getwd) and help(setwd)
+
+
+## Reading data into R
+There are multiple ways to import data in R. You can check out more comprehensive manual here: https://cran.r-project.org/doc/manuals/r-release/R-data.pdf
+
+Base R comes with a selection of built-in datasets. This can be handy to get started quickly on learning methods in R. To see a list, run data().
+
+```{r inbuilt_data, exercise = TRUE}
+data()
+```
+
+In this class we will mostly work with built-in datasets or data available in csv format either stored locally or online.
+
+For this tutorial please import the data located here: "https://raw.githubusercontent.com/guptashilpa/FA20-ISE201/master/Data/faithful_data.csv" and store it into a variable in_data
+
+The data consists of waiting time between eruptions and the duration of the eruption for the Old Faithful geyser in Yellowstone National Park, Wyoming, USA.
+```{r read_data, exercise = TRUE, exercise.eval=TRUE}
+
+```
+
+You could also run the View(in_data) to view the data table. Works in RStudio IDE.
+
+
+```{r read_data-check}
+grade_result(
+  pass_if(~ identical(.result, sum(vec3)), "Good job!")
+)
+```
+
+## Data Checks
+Please check if in_data is a data.frame
+```{r check_data, exercise = TRUE}
+
+```
+
+
+Print the first 5 rows of the in_data
+```{r print_data, exercise = TRUE}
+
+```
+
+Does the first column providing any useful information? If not, delete it
+```{r drop_col, exercise =TRUE}
+
+```
+There are multiple ways the data can be corrupted or missing. The missing values are typically represented as NA. 
+
+Please check if there are missing values in samplevec. Could you print the indices of the missing values.
+```{r check_miss, exercise = TRUE}
+samplevec = c(1:5, NA, 7:10, NA)
+
+```
+You can also 
+<div id="read_data-hint">
+**Hint:** You may want to check this out https://cran.r-project.org/doc/manuals/r-release/R-intro.html#Reading-data-from-files
+Or help(read.csv)
+</div>
+
+<div id="check_data-hint">
+**Hint:** You may want to check this out https://cran.r-project.org/doc/manuals/r-release/R-intro.html#Reading-data-from-files
+Or help(is.data.frame)
+</div>
+
+<div id="print_data-hint">
+**Hint:** You may want to check this out https://cran.r-project.org/doc/manuals/r-release/R-intro.html#Reading-data-from-files
+Or help(head)
+</div>
+
+<div id="check_miss-hint">
+**Hint:** You may want to check this out https://uc-r.github.io/missing_values
+Or help(is.na) and help(which)
+</div>
+
+<div id="drop_col-hint">
+**Hint:** You may want to check this out https://cran.r-project.org/doc/manuals/r-release/R-intro.html#Index-vectors
+Or https://stackoverflow.com/questions/4605206/drop-data-frame-columns-by-name
+</div>
+
+## Data Summary
+
+It is usually a good idea to understand the variables and visually inspect the data 
+
+Print the key statistics of the variables
+```{r data_summary, exercise = TRUE}
+
+```
+
+Plot a scatter plot of data
+```{r data_plot, exercise = TRUE}
+
+```
+
+<div id="data_summary-hint">
+**Hint:** You may want to check this out help(summary)
+</div>
+
+<div id="data_plot-hint">
+**Hint:** You may want to check this out help(plot)
+</div>
+
+## Quiz
+
+```{r quiz}
+quiz(
+  question("Which package contains functions for installing other R packages?",
+    answer("base"),
+    answer("tools"),
+    answer("utils", correct = TRUE),
+    answer("codetools")
+  ),
+  question("Which of the R packages listed below are used to create plots?",
+    answer("lattice", correct = TRUE),
+    answer("tools"),
+    answer("stats"),
+    answer("grid", correct = TRUE)
+  )
+)
+```
+
+
+## Wrap Up & Submit
+
+Congratulations, we hope you enjoyed reviewing what we've learned so far!
+
+
+```{r context="server"}
+learnrhash::encoder_logic()
+```
+
+```{r encode, echo=FALSE}
+# learnrhash::encoder_ui(url = "https://forms.gle/nmsi2WfR2zGp2C5f9")
+learnrhash::encoder_ui(
+  ui_before = shiny::div(
+    "If you have completed this tutorial and are happy with all of your",
+    "solutions, please click the button below to generate your hash and",
+    "submit it using the following form:",
+    shiny::tags$br()
+  ), 
+  ui_after = learnrhash::iframe_ui(
+    src = "https://docs.google.com/forms/d/e/1FAIpQLScBHgBdxRxmm5uakvK1NU4pmD9TDpU-RDkrEXcXog9nuc-RHQ/viewform?embedded=true" 
+    , width="640px", height= "300px", frameborder="0", marginheight="0", marginwidth="0"
+  )
+)
+```

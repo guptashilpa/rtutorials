@@ -1,0 +1,272 @@
+---
+title: "Principal Components Analysis"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(car)
+knitr::opts_chunk$set(echo = FALSE)
+tutorial_options(exercise.eval = TRUE)
+```
+
+
+## Motivation
+
+Lets consider this dataset, it has highly correlated variables. We would like to understand the relationship between variables or relationship with response and variables
+
+
+## Eigen Decomposition 
+(theory)
+
+Gives us scalars and orthogonal vectors. What does that mean?
+
+So how does this help with our data?
+
+
+## Principal Components Analysis 
+(complete demo)
+
+
+## Quiz
+
+
+## What next? 
+(demo of application on regression or clustering )
+
+
+The data was extracted from the 1974 Motor Trend US magazine, and comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973–74 models). 
+
+**The objective is to predict gasoline mileage**
+
+Format
+A data frame with 32 observations on 11 (numeric) variables.
+
+* [, 1]	mpg	Miles/(US) gallon  
+* [, 2]	cyl	Number of cylinders   
+* [, 3]	disp	Displacement (cu.in.)    
+* [, 4]	hp	Gross horsepower    
+* [, 5]	drat	Rear axle ratio    
+* [, 6]	wt	Weight (1000 lbs)    
+* [, 7]	qsec	1/4 mile time    
+* [, 8]	vs	Engine (0 = V-shaped, 1 = straight)    
+* [, 9]	am	Transmission (0 = automatic, 1 = manual)    
+* [,10]	gear	Number of forward gears    
+* [,11]	carb	Number of carburetors   
+
+We start with loading the data
+
+```{r load_car_data, exercise=TRUE}
+attach(mtcars)
+head(mtcars)
+```
+## Descriptive Data Analysis
+
+```{r summarise_data_, exercise=TRUE}
+dim(mtcars)
+```
+
+```{r summarise_data2_, exercise=TRUE}
+summary(mtcars)
+```
+Don't notice any missing observations or obvious data error. The format looks good for further analysis
+
+## Data Visualization
+Visualize the distribution of the variables and the bi-variate relationships
+
+```{r data_visualization_, exercise=TRUE}
+#scatter plot
+panel.hist <- function(x, ...)
+{
+    usr <- par("usr"); on.exit(par(usr))
+    par(usr = c(usr[1:2], 0, 1.5) )
+    h <- hist(x, plot = FALSE)
+    breaks <- h$breaks; nB <- length(breaks)
+    y <- h$counts; y <- y/max(y)
+    rect(breaks[-nB], 0, breaks[-1], y, col = "grey", ...)
+}
+panel.cor <- function(x, y, digits = 2, prefix = "", cex.cor, ...)
+{
+    usr <- par("usr"); on.exit(par(usr))
+    par(usr = c(0, 1, 0, 1))
+    r <- abs(cor(x, y))
+    txt <- format(c(r, 0.123456789), digits = digits)[1]
+    txt <- paste0(prefix, txt)
+    if(missing(cex.cor)) cex.cor <- 0.8/strwidth(txt)
+    text(0.5, 0.5, txt, cex = cex.cor * r)
+}
+pairs(mtcars,lower.panel = panel.smooth, upper.panel=panel.cor,diag.panel=panel.hist)
+
+```
+Notice high correlations , for instance between weight and displacement, qsec and hp. This indicates presence of multicollinearity. Potential for reducing the variables for regression
+
+It is a good idea to plot box plot and check for any observations that look suspicious. Left as an exercise for the user
+```{r boxplot_example_, eval=FALSE, include=FALSE}
+boxplot(mpg~cyl,data=mtcars, main="Car Milage Data",
+   xlab="Number of Cylinders", ylab="Miles Per Gallon")
+```
+
+```{r boxplot_uni_, exercise = TRUE, include=TRUE}
+
+
+```
+## Dimension Reduction
+Lets try PCA. Notice the variables are in different scales. Lets start with computing and visualizing the correlation matrix
+```{r pca,exercise=TRUE}
+corMat = cor(mtcars[,-1])
+library(corrplot)
+
+corrplot.mixed(cor(mtcars), order="hclust", tl.col="black")
+```
+
+
+Eigen Analysis and plotting the percentage variance explained
+```{r eigen_analysis_, exercise=TRUE}
+library(ggplot2)
+eigenRes = eigen(corMat)
+
+PVE <- eigenRes$values / sum(eigenRes$values)
+# Percent variance explained
+#Cumulative percent variance explained
+cumsum(PVE)
+
+PVEplot <- qplot(c(1:10), PVE) + 
+  geom_line() + 
+  xlab("Principal Component") + 
+  ylab("PVE") +
+  ggtitle("Scree Plot") +
+  ylim(0, 1)
+
+PVEplot
+
+# Cumulative PVE plot
+cumPVE <- qplot(c(1:10), cumsum(PVE)) + 
+  geom_line() + 
+  xlab("Principal Component") + 
+  ylab(NULL) + 
+  ggtitle("Cumulative Scree Plot") +
+  ylim(0,1)
+
+cumPVE
+```
+
+What are the first three principal components?
+```{r pc, exercise =TRUE}
+#plot number of eigen values that need to be selected
+evecs = eigenRes$vectors[,1:3]
+colnames(evecs) = c("PC1", "PC2", "PC3")
+row.names(evecs) = colnames(mtcars)[-1]
+evecs
+```
+
+## Regression
+Building empirical models
+
+Before we begin regression modeling, we need to check the distribution of the response we are trying to predict
+
+```{r check_dist_, exercise=TRUE}
+qqnorm(mtcars$mpg)
+qqline(mtcars$mpg, distribution = qnorm )
+```
+
+Some of the questions we are trying to address with performing regression analysis
+Q:  Is the model statistically different from zero (p-value < 0.05)?
+Q: Is the model is predictive (Adjusted R-squared > 0.95).
+
+
+```{r reg_example, exercise=TRUE}
+full_model = "cyl+disp+hp+drat+wt+qsec+vs+am+gear+carb" 
+sig_model = "am+qsec+wt"
+fit = lm(mpg~am+qsec+wt, data=mtcars)
+summary(fit)
+plot(fit)
+```
+
+Other functions you can try:
+
+* coefficients(fit) # model coefficients 
+* confint(fit, level=0.95) # CIs for model parameters
+* fitted(fit) # predicted values
+* residuals(fit) # residuals
+* anova(fit) # anova table
+* vcov(fit) # covariance matrix for model parameters
+* influence(fit) # regression diagnostics
+
+```{r reg_func, exercise = TRUE}
+confint(fit, level=0.95)
+```
+
+```{r check_res, exercise=TRUE}
+# diagnostic plots
+layout(matrix(c(1,2,3,4),2,2)) # optional 4 graphs/page
+plot(fit)
+```
+
+## Additional Regression Diagnostics
+```{r outlier_lev, exercise =TRUE}
+# Assessing Outliers
+outlierTest(fit) # Bonferonni p-value for most extreme obs
+qqPlot(fit, main="QQ Plot") #qq plot for studentized resid
+leveragePlots(fit) # leverage plots
+```
+
+```{r inf_pts, exercise =TRUE}
+# Influential Observations
+# added variable plots
+# car::av.Plots(fit)
+# Cook's D plot
+# identify D values > 4/(n-k-1)
+cutoff <- 4/((nrow(mtcars)-length(fit$coefficients)-2))
+plot(fit, which=4, cook.levels=cutoff)
+# Influence Plot
+influencePlot(fit, id.method="identify", main="Influence Plot", sub="Circle size is proportial to Cook's Distance" )
+```
+
+```{r non-norm, exercise = TRUE}
+# Normality of Residuals
+# qq plot for studentized resid
+qqPlot(fit, main="QQ Plot")
+# distribution of studentized residuals
+library(MASS)
+sresid <- studres(fit)
+hist(sresid, freq=FALSE,
+   main="Distribution of Studentized Residuals")
+xfit<-seq(min(sresid),max(sresid),length=40)
+yfit<-dnorm(xfit)
+lines(xfit, yfit)
+```
+
+
+```{r multico, exercise = TRUE}
+# Evaluate Collinearity
+vif(fit) # variance inflation factors
+sqrt(vif(fit)) > 2 # problem?
+```
+
+```{r durbwat, exercise = TRUE}
+# Test for Autocorrelated Errors
+durbinWatsonTest(fit)
+```
+
+## ANOVA
+
+**Analysis of Variance** technique partitions the total variability in the sample data into component parts - variance explained by the regression line and the residual variance unexplained by the regression line. 
+![](images/anova.jpg)
+ANOVA F-Test
+$F_0 = MS_R/MS_E$
+Under null hypothesis $F_0$ has F-distribution with $(a-1)$ and $a(n-1)$ degrees of freedom
+
+Lets perform ANOVA on our model from previous section   
+
+```{r aov_example_, exercise=TRUE}
+fit = aov(mpg~am+qsec+wt, data=mtcars)
+summary(fit)
+```
+
+```{r aov_example2, exercise=TRUE}
+fit = lm(mpg~am+qsec+wt, data=mtcars)
+# anova(fit)
+summary(fit)
+```
+
