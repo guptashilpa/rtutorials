@@ -1,0 +1,85 @@
+---
+title: "Tutorial"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+## Topic 1
+
+### Exercise 
+
+---
+# Example Challenger O Ring
+
+```{r, out.width="45%"}
+challenger <- read_csv("data/challenger_ORing_data.csv")
+colnames(challenger) <- c("Temperature", "Failure")
+challenger %>% ggplot() + geom_point(mapping = aes(x = Temperature, y = Failure)) 
+```
+---
+# Example - Fitting a logistic Regression
+
+```{r}
+fit.logit <- glm(Failure ~ Temperature, data = challenger, family = binomial(link='logit'))
+summary(fit.logit)
+```
+
+---
+# Example - CI and Odds Ratio
+
+### Confidence Interval for the coefficient Estimates
+```{r}
+confint(fit.logit)
+```
+
+--
+
+### Odds Ratio
+```{r}
+exp(coef(fit.logit))
+```
+
+#### For a one degree increase in temperature, reduces the odds of failure by 0.84.
+
+---
+# Deviance
+```{r}
+anova(fit.logit, test="Chisq")
+```
+---
+# Accuracy
+```{r}
+fitted.results <- predict(fit.logit, type='response')
+fitted.results <- ifelse(fitted.results > 0.5,1,0)
+misClasificError <- mean(fitted.results != challenger$Failure)
+print(paste('Accuracy',1-misClasificError))
+```
+
+### Actual launch temperature was 31 $^{\circ}$ F
+```{r}
+test <- as.data.frame(cbind(31, 1))
+colnames(test) <- c("Temperature", "Failure")
+fitted.results <- predict(fit.logit, test, type='response')
+misClasificError <- mean(fitted.results != test$Failure)
+print(paste('Accuracy',1-misClasificError))
+```
+---
+# AUC 
+
+```{r, out.width="25%"}
+library(ROCR)
+p <- predict(fit.logit, type="response")
+pr <- prediction(p, challenger$Failure)
+prf <- performance(pr, measure = "tpr", x.measure = "fpr")
+plot(prf)
+auc <- performance(pr, measure = "auc")
+auc <- auc@y.values[[1]]
+auc
+```
+
