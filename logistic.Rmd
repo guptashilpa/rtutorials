@@ -1,78 +1,165 @@
 ---
 title: "Tutorial"
-output: learnr::tutorial
+output: 
+    learnr::tutorial:
+        progressive: true
+        allow_skip: true
+        clean: true
 runtime: shiny_prerendered
+description: "Welcome to logistic regression tutorial!"
 ---
 
 ```{r setup, include=FALSE}
 library(learnr)
+library(gradethis)
+gradethis::gradethis_setup()
+library(tidyverse)
 knitr::opts_chunk$set(echo = FALSE)
-```
-
-
-## Topic 1
-
-### Exercise 
-
----
-# Example Challenger O Ring
-
-```{r, out.width="45%"}
-challenger <- read_csv("data/challenger_ORing_data.csv")
+knitr::opts_chunk$set(warning = FALSE)
+challenger <- read_csv("data/challenger_ORing_data.csv",show_col_types = FALSE)
 colnames(challenger) <- c("Temperature", "Failure")
-challenger %>% ggplot() + geom_point(mapping = aes(x = Temperature, y = Failure)) 
 ```
----
-# Example - Fitting a logistic Regression
 
-```{r}
+
+## Introduction
+
+Linear Regression models are mathematical abstraction of real world relationship between response ($y$) and regressors or covariates ($x_1, x_2, ..., x_k$) 
+
+$y = \beta_0 + \beta_1 x_1 + \beta_2 x_2 + ... + \beta_k x_k + \epsilon$
+
+One of the assumption in linear model is that the response distribution can be approximated with a Normal distribution, i.e. continuous, bell shaped probability distribution. 
+
+What about situations where the response can only take on two values, binary, 1 or 0, 'success' or 'failure'? Here assumption of normality is not realistic. 
+
+Lets see some examples of where we might encounter this data
+
+
+## Example 
+
+### Challenger O Ring
+
+Lets take a look at the Challenger data from Montgomery and Runger
+
+Data has two columns and x rows. 
+### Load data
+```{r load_data_, exercise = TRUE}
+challenger <- read_csv("data/challenger_ORing_data.csv",show_col_types = FALSE)
+colnames(challenger) <- c("Temperature", "Failure")
+
+```
+
+
+
+### Verify data import by printing the number rows and columns of the dataset
+```{r data_check1_, exercise = TRUE, exercise.setup = "load_data_",exercise.blanks = "___+"}
+____(challenger)
+```
+
+
+```{r data_check1_-solution, exercise.reveal_solution = FALSE}
+dim(challenger)
+```
+
+```{r data_check1_-code-check}
+grade_code()
+```
+
+### Verify data import by the top 10 observations
+```{r data_check2_, exercise = TRUE, exercise.setup = "load_data_"}
+head(challenger)
+```
+
+
+```{r data_check2_-solution, exercise.reveal_solution = FALSE}
+head(challenger, 10)
+```
+
+```{r data_check2_-code-check}
+grade_code()
+```
+
+### Check Understanding
+```{r dtype, echo=FALSE}
+question("What is the data type of the response variable",
+  answer("double", correct = TRUE),
+  answer("int"),
+  answer("boolean"),
+  answer("char"),
+  incorrect = paste0("Incorrect. Check the data type when using head()"),
+  allow_retry = TRUE,
+  random_answer_order = TRUE
+)
+```
+
+### Plot 
+
+Scatter plot of Failure vs Temperature. Fill in the blanks with appropriate variable names
+
+```{r plot_, exercise = TRUE, exercise.blanks = "___+", exercise.setup = "load_data_"}
+ggplot(data = challenger) + geom_point(mapping = aes(x = "____" , y = "____")) 
+```
+
+
+
+
+```{r plot_-solution}
+challenger %>% ggplot() + geom_point(mapping = aes(x = "Temperature" , y = "Failure")) 
+```
+
+
+## Logistic Regression
+Let's fit logistic regression model
+
+In R, we will use the function `glm()` with parameters `family = binomial(link='logit')` option. Fill in the blanks with appropriate variable names
+
+
+```{r fit_, exercise.setup = "load_data_", exercise = TRUE, exercise.blanks = "___+"}
+fit.logit <- glm(____ ~ ____, data = challenger, family = binomial(link='logit'))
+```
+
+```{r fit_-solution}
 fit.logit <- glm(Failure ~ Temperature, data = challenger, family = binomial(link='logit'))
+```
+
+Now, lets look at the output
+```{r psumm_, exercise.setup = "fit_", exercise = TRUE}
 summary(fit.logit)
 ```
 
----
-# Example - CI and Odds Ratio
+## Example - CI and Odds Ratio
 
 ### Confidence Interval for the coefficient Estimates
-```{r}
-confint(fit.logit)
+```{r conf_, exercise.setup = "fit_", exercise = TRUE}
+print(confint(fit.logit))
 ```
-
---
 
 ### Odds Ratio
-```{r}
-exp(coef(fit.logit))
+r temp1 , exercise.setup = "fit_", exercise = TRUE
+print(exp(coef(fit.logit)))
+
+ For a one degree increase in temperature, reduces the odds of failure by 0.84.
+
+## Model Adequacy
+
+### Deviance
+```{r fanova_, exercise.setup = "fit_", exercise = TRUE}
+print(anova(fit.logit, test="Chisq"))
 ```
 
-#### For a one degree increase in temperature, reduces the odds of failure by 0.84.
+## Model Performance
 
----
-# Deviance
-```{r}
-anova(fit.logit, test="Chisq")
-```
----
-# Accuracy
-```{r}
+### Accuracy
+```{r ffitted_, exercise.setup = "fit_", exercise = TRUE}
 fitted.results <- predict(fit.logit, type='response')
 fitted.results <- ifelse(fitted.results > 0.5,1,0)
 misClasificError <- mean(fitted.results != challenger$Failure)
 print(paste('Accuracy',1-misClasificError))
 ```
 
-### Actual launch temperature was 31 $^{\circ}$ F
-```{r}
-test <- as.data.frame(cbind(31, 1))
-colnames(test) <- c("Temperature", "Failure")
-fitted.results <- predict(fit.logit, test, type='response')
-misClasificError <- mean(fitted.results != test$Failure)
-print(paste('Accuracy',1-misClasificError))
-```
----
-# AUC 
 
-```{r, out.width="25%"}
+### AUC 
+
+```{r fauc_, exercise.setup = "fit_", exercise = TRUE}
 library(ROCR)
 p <- predict(fit.logit, type="response")
 pr <- prediction(p, challenger$Failure)
@@ -83,3 +170,13 @@ auc <- auc@y.values[[1]]
 auc
 ```
 
+## Prediction
+
+### Actual launch temperature was 31 $^{\circ}$ F
+```{r fpredict_, exercise.setup = "fit_", exercise = TRUE}
+test <- as.data.frame(cbind(31, 1))
+colnames(test) <- c("Temperature", "Failure")
+fitted.results <- predict(fit.logit, test, type='response')
+misClasificError <- mean(fitted.results != test$Failure)
+print(paste('Accuracy',1-misClasificError))
+```

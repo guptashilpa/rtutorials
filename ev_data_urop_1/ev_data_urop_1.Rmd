@@ -1,0 +1,144 @@
+---
+title: "Learning to work with Open Gov Data - Tutorial"
+output: learnr::tutorial
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+
+## Data Background
+
+Before begining any analysis, it is prudent to get as much information about how the data was collected, when it was collected and for what purpose was the data collected. 
+
+In this tutorial, we will walk you through the steps of reading, preprocessing data obtained from data.gov
+
+
+### Reading Data
+
+For our tutorial, we will demonstrate using functions from `tidyverse` package. In order to achieve that, we need to laod in the package. Use the code chunck below to import the package
+
+```{r import-library, exercise=TRUE}
+library(...)
+```
+
+Write the R code required to read in the data using `read_csv()`. The data is available at this location `INCLUDE LOCATION`
+
+
+```{r read-data, exercise=TRUE}
+
+```
+
+Next step is to check for the data size and also quick quality check to ensure how many, if any missing values or duplicate rows are present in the data
+
+### Data Size
+
+What is the size of data? How many observations and how many variables? We will use the function `dim()`
+*Print the number of rows and number of columns in the dataset*
+
+```{r data-dim, exercise=TRUE, exercise.lines = 5}
+
+```
+
+### Quick quality check
+
+How many missing values? What are the variable types? 
+
+```{r data-check, exercise=TRUE, exercise.lines = 5}
+
+```
+
+## Descriptive Data
+
+How many columns are categorical and numeric?
+
+```{r data-types, exercise=TRUE, exercise.lines = 5}
+
+```
+For numeric columns, what do the summary statistics for central tendency and spread looks like?
+
+```{r num-stats, exercise=TRUE, exercise.lines = 5}
+
+```
+For categorical columns, what is the distribution across caetgories and the mode value.
+
+```{r cat-stats, exercise=TRUE, exercise.lines = 5}
+
+```
+## Data Visualization
+
+### Distribution
+To ascertain distribution, we will use histogram for numeric variables and bar plots for categorical variables
+
+```{r hist, exercise=TRUE, exercise.lines = 5}
+
+```
+
+```{r bar, exercise=TRUE, exercise.lines = 5}
+
+```
+
+```{r boxplot, exercise=TRUE, exercise.lines = 5}
+
+```
+### Relationship
+Scatter plot 
+
+```{r scatter, exercise=TRUE, exercise.lines = 5}
+
+```
+Correlation coefficient
+
+```{r cor-coef, exercise=TRUE, exercise.lines = 5}
+
+```
+###
+
+
+## Hypothesis Testing [Need to update]
+
+
+### Exercise with Hint
+
+*Here's an exercise where the chunk is pre-evaluated via the `exercise.eval` option (so the user can see the default output we'd like them to customize). We also add a "hint" to the correct solution via the chunk immediate below labeled `print-limit-hint`.*
+
+Modify the following code to limit the number of rows printed to 5:
+
+```{r print-limit, exercise=TRUE, exercise.eval=TRUE}
+mtcars
+```
+
+```{r print-limit-hint}
+head(mtcars)
+```
+
+### Quiz
+
+*You can include any number of single or multiple choice questions as a quiz. Use the `question` function to define a question and the `quiz` function for grouping multiple questions together.*
+
+Some questions to verify that you understand the purposes of various base and recommended R packages:
+
+```{r quiz}
+quiz(
+  question("Which package contains functions for installing other R packages?",
+    answer("base"),
+    answer("tools"),
+    answer("utils", correct = TRUE),
+    answer("codetools")
+  ),
+  question("Which of the R packages listed below are used to create plots?",
+    answer("lattice", correct = TRUE),
+    answer("tools"),
+    answer("stats"),
+    answer("grid", correct = TRUE)
+  )
+)
+```
+
+## About
+
+This tutorial has been prepared by Tai Shih under the guidance of Dr. Shilpa Gupta as part of the UROP. Please contact shilpa.gupta@sjsu.edu for questions or comments. 
+
